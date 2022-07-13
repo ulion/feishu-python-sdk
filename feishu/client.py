@@ -111,6 +111,7 @@ class FeishuClient(FeishuBaseClient, FeishuAPI):
                 payload: dict = {},
                 data: dict = {},
                 files: dict = {},
+                headers: dict = {},
                 auth: str = True) -> Union[dict, bytes, Future]:
         """发起请求
 
@@ -135,14 +136,16 @@ class FeishuClient(FeishuBaseClient, FeishuAPI):
         if self.closed:
             raise FeishuError(ERRORS.CLIENT_CLOSED, "client对象已被关闭")
 
-        headers = {
-            "Content-Type": "application/json",
-        }
+        if not headers:                
+            headers = {
+                "Content-Type": "application/json",
+            }
+            if files:
+                headers.pop("Content-Type")
+
 
         url = self.endpoint + api
         timeout_pair = (self.timeout / 3, self.timeout * 2 / 3)
-        if files:
-            headers.pop("Content-Type")
 
         if self.run_async:
             async def do_request_async():
@@ -229,6 +232,15 @@ class FeishuClient(FeishuBaseClient, FeishuAPI):
                                   f"files.keys={files.keys()} headers={headers} (id={request_id})")
                 resp = self.session.post(url, params=params, json=payload, data=data, files=files,
                                          headers=headers, timeout=timeout_pair)
+
+            elif method == "PATCH":
+                self.logger.debug(f"PATCH url={url} params={params} json={payload} data={data} "
+                                  f"files.keys={files.keys()} headers={headers} (id={request_id})")
+                resp = self.session.patch(url, params=params, json=payload, data=data, headers=headers, timeout=timeout_pair)
+            elif method == "DELETE":
+                self.logger.debug(f"DELETE url={url} params={params} headers={headers} (id={request_id})")
+                resp = self.session.delete(url, params=params, headers=headers, timeout=timeout_pair)
+
             else:
                 raise FeishuError(ERRORS.UNSUPPORTED_METHOD,
                                   f"不支持的请求method: {method}, 调用上下文: "

@@ -128,7 +128,7 @@ class BotAPI(BaseAPI):
                 "page_token": "0"
             }
         """
-        api = "/chat/v4/list"
+        api = "/im/v1/chats"
         payload = {
             "page_size": str(page_size),
         }
