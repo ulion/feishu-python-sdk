@@ -232,7 +232,11 @@ class FeishuClient(FeishuBaseClient, FeishuAPI):
                                   f"files.keys={files.keys()} headers={headers} (id={request_id})")
                 resp = self.session.post(url, params=params, json=payload, data=data, files=files,
                                          headers=headers, timeout=timeout_pair)
-
+            elif method == "PUT":
+                self.logger.debug(f"PUT url={url} params={params} json={payload} data={data} "
+                                  f"files.keys={files.keys()} headers={headers} (id={request_id})")
+                resp = self.session.put(url, params=params, json=payload, data=data, files=files,
+                                         headers=headers, timeout=timeout_pair)
             elif method == "PATCH":
                 self.logger.debug(f"PATCH url={url} params={params} json={payload} data={data} "
                                   f"files.keys={files.keys()} headers={headers} (id={request_id})")
